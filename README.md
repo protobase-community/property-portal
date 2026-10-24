@@ -1,21 +1,53 @@
-# Property portal example
+# Property portal
 
-A public portal of homes for sale and for rent in the Netherlands and Spain. A Dutch home for sale is often let in the meantime (leegstandswet), so a listing can be offered both ways. Visitors browse and filter the listings without signing in; members save the searches they filter, which mail them new listings, save favorites and write notes, which nobody else sees. A real Postgres 18 database, seeded deterministically with Dutch and Spanish places, agencies and listings, published over the year up to 2026-10-12.
+A public portal of homes for sale and for rent in the Netherlands and Spain. Visitors browse, filter and map the
+listings without signing in; members save the searches they filter, which mail them new listings, save favorites and
+write private notes. A Dutch home for sale is often let in the meantime (leegstandswet), so a listing can be offered
+both ways. It runs on a real Postgres 18 database, seeded deterministically with Dutch and Spanish places, agencies and
+listings, published over the year up to 2026-10-12.
 
-This is not the [real estate example](../real-estate/README.md), which is the back office of one letting agency.
+See it live at [property-portal.protobase.net](https://property-portal.protobase.net). For the back office of one
+letting agency, see [property-management](https://github.com/protobase-community/property-management).
 
-## Start
+## Use this template
 
-The database sits beside the other examples' in the same Postgres container, as `property_portal`.
+Press **Use this template** at the top of this page, then **Create a new repository**, to get your own copy with a
+clean history. Clone it and follow the setup below:
 
 ```sh
-bun run db:up                                                # repository root: docker compose up, creates the property_portal database and .env from .env.example
-bun run --cwd examples/property-portal db:migrate
-bun run --cwd examples/property-portal db:seed --scale small  # small | medium | large
-bun run --cwd examples/property-portal map:tiles              # the listing map's tiles, in a terminal of its own
-bun run --cwd examples/property-portal dev                    # http://localhost:5173
-bun run --cwd examples/property-portal test                   # the unit tests next to the config, the jobs and the seed
+git clone https://github.com/<you>/<your-repository>.git
+cd <your-repository>
 ```
+
+## Setup
+
+You need [Bun](https://bun.sh) 1.4 and Docker.
+
+```sh
+bun install
+bun run db:up                     # Postgres 18 in Docker on port 55432; creates .env from .env.example
+bun run db:migrate
+bun run db:seed --scale small     # small | medium | large
+bun run map:tiles                 # the listing map's tiles, in a terminal of its own
+bun run dev                       # http://localhost:5173
+bun run test                      # the unit tests next to the config, the jobs and the seed
+```
+
+Set your own `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`).
+
+## Built with Protobase
+
+[Protobase](https://github.com/PrototeamHQ/protobase) builds the app from a Postgres database and a typed config: each table's data config sits in
+`config/<name>/data.ts` and its screens in `config/<name>/ui.ts`, all exported from `config/index.ts`, and
+`protobase dev` and `protobase serve` serve the API and the app from them.
+
+- Tested with Protobase **0.45.9**: the `@protobase/*` packages are pinned to it in `package.json`, and CI runs
+  against it. To upgrade, set the new version on each `@protobase/*` package, run `bun install`, then
+  `bun run typecheck`, `bun run test` and `bun run build`. The [release notes](https://github.com/PrototeamHQ/protobase/releases) say what changed.
+- Docs: [docs.protobase.net](https://docs.protobase.net). Source and issues: [PrototeamHQ/protobase](https://github.com/PrototeamHQ/protobase).
+- This app started as an example in Protobase's repository; its history came with it.
+
+## Accounts
 
 Sign in with one of the seeded accounts, all with the password `property-portal-demo`:
 
@@ -27,7 +59,7 @@ Sign in with one of the seeded accounts, all with the password `property-portal-
 
 Anyone can also make their own account: **Create an account** on the sign-in page, or on a sign-in prompt, emails a code to the address; once the code is right, a name and a password make a member ([Open sign-up](https://docs.protobase.net/reference/auth/#open-sign-up), turned on in `auth/accounts.ts`). It needs mail, `PROTOBASE_SMTP_URL` and `PROTOBASE_MAIL_FROM` in `.env`, with a mail catcher such as Mailpit in development; without them it is not offered.
 
-Other scripts: `db:reset` (drop, migrate, seed small), `typecheck`, `serve` (`protobase build`, then `protobase serve dist` on port 8787). More accounts: `bun run --cwd examples/property-portal protobase users create you@example.com --generate-password` makes a member; `--role admin` an admin. The database tests are the repository's `bun run test:integration`.
+Other scripts: `db:reset` (drop, migrate, seed small), `typecheck`, `serve` (`protobase build`, then `protobase serve dist` on port 8787). More accounts: `bun run protobase users create you@example.com --generate-password` makes a member; `--role admin` an admin. The database tests run in [Protobase's repository](https://github.com/PrototeamHQ/protobase) (`bun run test:integration`).
 
 The same data is a REST API with an OpenAPI document: [API.md](API.md) walks through signing in, listing published listings and creating and publishing one with `curl`.
 
@@ -117,4 +149,13 @@ Both photo fields store a `card` (800×600) and a `thumb` (96×96) WebP beside e
 - `emails/`: the alert mails as React Email templates, tested next to them.
 - `map/`: the development map tiles proxy, tested next to it.
 - `seed/`: `world.ts` builds everything from the scale, `builders/` one place, agency, listing or member from its ordinal, `steps/` write them, `photos/` draws the pictures.
-- `tests/examples/property-portal/` (in the repository root): `smoke.test.ts` checks counts and rules of the seed, `access.integration.test.ts` what two members and a visitor see and may do through the API, `alerts.integration.test.ts` a publish through to the alert and its mail, and a search switched to mail at once, `sign-up.integration.test.ts` an account made by signing up, a member that sees only its own data.
+- `tests/examples/property-portal/` in [Protobase's repository](https://github.com/PrototeamHQ/protobase): `smoke.test.ts` checks counts and rules of the seed, `access.integration.test.ts` what two members and a visitor see and may do through the API, `alerts.integration.test.ts` a publish through to the alert and its mail, and a search switched to mail at once, `sign-up.integration.test.ts` an account made by signing up, a member that sees only its own data.
+
+## Contributing
+
+Contributions are welcome, from a typo to a new screen: see [CONTRIBUTING.md](CONTRIBUTING.md). A problem in Protobase
+itself goes to [Protobase's issues](https://github.com/PrototeamHQ/protobase/issues).
+
+## Licence
+
+[Apache License 2.0](LICENSE).
