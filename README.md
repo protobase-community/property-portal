@@ -11,17 +11,6 @@ photos.
 **[Open the live demo](https://property-portal.protobase.net)**, which resets every day. For the back office of one
 letting agency, see [property-management](https://github.com/protobase-community/property-management).
 
-## Deploy on Protobase Cloud
-
-The property portal is not one of Protobase Cloud's starting points, so deploy your own copy: make it with
-**Use this template** (below), then [start in the cloud](https://admin.protobase.net/start) and sign up with GitHub or email. In the
-[console](https://admin.protobase.net), press **New app**, pick **An existing GitHub repository** under **Start from**
-and choose your copy. Protobase keeps the app in sync with the repository and deploys every push. Protobase Cloud is in
-early access, with [plans](https://protobase.net/pricing) from €0.99 a month per app.
-
-The listing map needs a map style of your own, named by `PROTOBASE_MAP_STYLE_URL` ([Map](#map)); without it the app
-draws no map.
-
 ## Run it locally
 
 You need [Bun](https://bun.sh) 1.4 and Docker.
