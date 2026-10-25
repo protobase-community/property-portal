@@ -1,25 +1,28 @@
 # Property portal
 
-A public portal of homes for sale and for rent in the Netherlands and Spain. Visitors browse, filter and map the
-listings without signing in; members save the searches they filter, which mail them new listings, save favorites and
-write private notes. A Dutch home for sale is often let in the meantime (leegstandswet), so a listing can be offered
-both ways. It runs on a real Postgres 18 database, seeded deterministically with Dutch and Spanish places, agencies and
-listings, published over the year up to 2026-10-12.
+A public portal of homes for sale and for rent in the Netherlands and Spain. Visitors browse without an
+account, and anyone can sign up. Members keep favorites, private notes and saved searches that email new homes at once
+or once a day. It has photo carousels with resized images and placeholders, and a map with approximate positions. A
+Dutch home for sale is often let in the meantime (leegstandswet), so a listing can be offered both ways.
 
-See it live at [property-portal.protobase.net](https://property-portal.protobase.net). For the back office of one
+The seed holds Dutch and Spanish places, agencies and listings, from a small set up to 100,000 listings and 433,000
+photos.
+
+**[Open the live demo](https://property-portal.protobase.net)**, which resets every day. For the back office of one
 letting agency, see [property-management](https://github.com/protobase-community/property-management).
 
-## Use this template
+## Deploy on Protobase Cloud
 
-Press **Use this template** at the top of this page, then **Create a new repository**, to get your own copy with a
-clean history. Clone it and follow the setup below:
+The property portal is not one of Protobase Cloud's starting points, so deploy your own copy: make it with
+**Use this template** (below), then [start in the cloud](https://admin.protobase.net/start) and sign up with GitHub or email. In the
+[console](https://admin.protobase.net), press **New app**, pick **An existing GitHub repository** under **Start from**
+and choose your copy. Protobase keeps the app in sync with the repository and deploys every push. Protobase Cloud is in
+early access, with [plans](https://protobase.net/pricing) from €0.99 a month per app.
 
-```sh
-git clone https://github.com/<you>/<your-repository>.git
-cd <your-repository>
-```
+The listing map needs a map style of your own, named by `PROTOBASE_MAP_STYLE_URL` ([Map](#map)); without it the app
+draws no map.
 
-## Setup
+## Run it locally
 
 You need [Bun](https://bun.sh) 1.4 and Docker.
 
@@ -30,10 +33,43 @@ bun run db:migrate
 bun run db:seed --scale small     # small | medium | large
 bun run map:tiles                 # the listing map's tiles, in a terminal of its own
 bun run dev                       # http://localhost:5173
-bun run test                      # the unit tests next to the config, the jobs and the seed
+bun run test
 ```
 
-Set your own `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`).
+Set your own `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`), and sign in with one of the
+[seeded accounts](#accounts). `bun run db:down` stops the database.
+
+## Use it as a template
+
+Press **Use this template** at the top of this page, then **Create a new repository**, to get your own copy with a
+clean history. Clone it and run it as above:
+
+```sh
+git clone https://github.com/<you>/<your-repository>.git
+cd <your-repository>
+```
+
+You can also fork it to contribute back, or start from it with `git clone https://github.com/protobase-community/property-portal.git`.
+
+## Customise it
+
+- **Tables and screens.** Each table's data config is in `config/<name>/data.ts` (fields, validation, who may read
+  and change what) and its screens in `config/<name>/ui.ts` (lists, filters, record pages), all exported from
+  `config/index.ts`. See the [data config](https://docs.protobase.net/reference/data-config/) and [UI config](https://docs.protobase.net/reference/ui-config/)
+  references.
+- **Database changes.** Add a migration in `db/migrations/`, numbered after the last one, and run
+  `bun run db:migrate`. Never edit a migration that has run. For a new table, `bun run protobase scaffold
+  <connection string> --ui` reads the database and writes its `data.ts` and `ui.ts`, which you then adjust.
+- **Sign-in and accounts** are in `auth/`, on Better Auth ([Login](https://docs.protobase.net/reference/auth/)).
+- **Coding agents.** [AGENTS.md](AGENTS.md) holds the rules an assistant follows when it changes the app.
+- Check every change with `bun run typecheck`, `bun run test` and `bun run build`, as CI does.
+
+- **Who sees what.** Members' rows are theirs through `.owner(...)` and `.own` capabilities; the roles are in
+  `config/roles.ts` ([Access](https://docs.protobase.net/reference/access/)).
+- **Alerts and mail.** The alert jobs are in `jobs/` ([Jobs](https://docs.protobase.net/reference/jobs/)) and the mails, React Email
+  templates, in `emails/`. Mail goes through `PROTOBASE_SMTP_URL` and `PROTOBASE_MAIL_FROM` in `.env`.
+- **Map and photos.** The map style is `PROTOBASE_MAP_STYLE_URL`, the aerial photo layers `config/map-layers.ts`, and
+  the photo sizes `config/photo-variants.ts`.
 
 ## Built with Protobase
 
