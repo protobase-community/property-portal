@@ -123,7 +123,10 @@ export const listingAt = (places: PlaceSeed[], agenciesByPlace: Map<number, Seed
   const status = draft ? 'available' : statusOf(offerType, age, rand)
   const sentences = [details.transport, details.quiet, details.renovated, details.original, details.insulated].filter(() => rand() < 0.35)
   const description = [
-    `${pick(rand, openings[propertyType]!)} in ${place.name}, ${livingArea} m² with ${rooms === 1 ? 'one room' : `${rooms} rooms`}.`,
+    // The size starts a sentence of its own: a number right after a name in Arabic or Hebrew would join it and show on
+    // the wrong side.
+    `${pick(rand, openings[propertyType]!)} in ${place.name}.`,
+    `It has ${livingArea} m² and ${rooms === 1 ? 'one room' : `${rooms} rooms`}.`,
     ...(garden ? [details.garden] : []),
     ...(balcony ? [details.balcony] : []),
     ...(parking ? [details.parking] : []),
