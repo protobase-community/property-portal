@@ -28,11 +28,11 @@
     "dev": "protobase dev"
   },
   "dependencies": {
-    "@protobase/cli": "~0.46.11",
-    "@protobase/layout": "~0.46.11",
-    "@protobase/schema": "~0.46.11",
-    "@protobase/server": "~0.46.11",
-    "@protobase/ui": "~0.46.11",
+    "@protobase/cli": "~0.47.1",
+    "@protobase/layout": "~0.47.1",
+    "@protobase/schema": "~0.47.1",
+    "@protobase/server": "~0.47.1",
+    "@protobase/ui": "~0.47.1",
     "better-auth": "^1.7.12",
     "kysely": "^0.29.6",
     "pg": "^8.23.1",
