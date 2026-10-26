@@ -17,6 +17,7 @@ You need [Bun](https://bun.sh) 1.4 and Docker.
 
 ```sh
 bun install
+bun run protobase skill install   # gives Claude Code, Codex and other agents the docs of this Protobase version
 bun run db:up                     # Postgres 18 in Docker on port 55435; creates .env from .env.example
 bun run db:migrate
 bun run db:doctor                 # checks the config against the database, as a deploy to Protobase Cloud does
@@ -40,6 +41,14 @@ cd <your-repository>
 ```
 
 You can also fork it to contribute back, or start from it with `git clone https://github.com/protobase-community/property-portal.git`.
+
+## Put it online
+
+[Protobase Cloud](https://console.protobase.net/start) runs your copy from its GitHub repository: in the console,
+choose **New app**, then **An existing GitHub repository**, and pick it. Every push to the default branch deploys:
+the build runs `protobase build`, then `db:migrate` and `protobase doctor` against the app's database, and the
+previous version keeps serving when a step fails. It does not run the typecheck or the tests, so run them before
+pushing.
 
 ## Customise it
 
