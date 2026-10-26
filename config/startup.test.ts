@@ -1,14 +1,23 @@
+import { fileURLToPath } from 'node:url'
+import sharp from 'sharp'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { configExports, createAdmin, mergeConfig, type Authenticator, type ProjectConfig } from '@protobase/server'
+import { loadProjectAuth } from '@protobase/cli/auth'
+import { configExports, createAdmin } from '@protobase/server'
+import config from '../protobase.config'
+import * as portal from './index'
+import { roles } from './roles'
 
 // Protobase's own check that each example starts (packages/cli/src/project/examples-admin.test.ts in
 // github.com/PrototeamHQ/protobase), run here against the pinned release: the app's admin API built from its config
-// exports with its own auth, as `dev` and `serve` build it, so a startup check such as an owner field that must hold the
-// user ids refuses here instead of on the app's first start. Building the API reaches no database.
+// with its own auth, as `dev` and `serve` build it, so a startup check such as an owner field that must hold the user ids
+// refuses here instead of on the app's first start. Building the API reaches no database.
+
+const root = fileURLToPath(new URL('..', import.meta.url))
 
 describe('the app', () => {
   beforeAll(() => {
-    vi.stubEnv('BETTER_AUTH_SECRET', 'a-secret-only-this-test-uses-0123456789')
+    vi.stubEnv('PROTOBASE_SECRET', 'a-secret-only-this-test-uses-0123456789')
+    vi.stubEnv('PROTOBASE_URL', 'http://localhost:5173')
     vi.stubEnv('DATABASE_URL', 'postgres://nobody@127.0.0.1:1/none')
   })
 
@@ -17,9 +26,9 @@ describe('the app', () => {
   })
 
   it('passes the startup checks with its own auth', async () => {
-    const project = mergeConfig(((await import('../protobase.config')).default ?? {}) as ProjectConfig)
-    expect(project.auth, 'the app signs in with Better Auth').toBeDefined()
-    const { resources, views, pages, userMenu, bottomBars, subscriptions } = configExports(project.config ?? {})
+    expect(config.auth, 'the app signs in with Better Auth').toBeDefined()
+    const auth = await loadProjectAuth(root)
+    const { resources, views, pages, userMenu, bottomBars, subscriptions } = configExports(portal)
     expect(() =>
       createAdmin({
         resources,
@@ -29,17 +38,12 @@ describe('the app', () => {
         bottomBars,
         subscriptions,
         db: {} as never,
-        authenticate: project.authenticate as Authenticator,
-        ...(project.auth && { auth: project.auth }),
-        ...(project.functions && { functions: project.functions }),
-        ...(project.files && { files: project.files }),
-        ...(project.events && { events: project.events }),
-        ...(project.history && { history: project.history }),
-        ...(project.webhooks && { webhooks: project.webhooks }),
-        ...(project.notifications && { notifications: project.notifications }),
-        ...(project.mobile && { mobile: project.mobile }),
-        ...(project.app && { app: project.app }),
-        ...(project.options && { options: project.options }),
+        authenticate: () => {
+          throw new Error('No requests in this test')
+        },
+        auth,
+        files: { sharp },
+        options: { roles, ...(config.maps !== undefined && { maps: config.maps }) },
       }),
     ).not.toThrow()
   }, 60_000)

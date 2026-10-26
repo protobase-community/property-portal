@@ -32,7 +32,7 @@ bun run dev                       # http://localhost:5173
 bun run test
 ```
 
-Set your own `BETTER_AUTH_SECRET` in `.env` (`openssl rand -base64 32`), and sign in with one of the
+Set your own `PROTOBASE_SECRET` in `.env` (`openssl rand -base64 32`), and sign in with one of the
 [seeded accounts](#accounts). `bun run db:down` stops the database.
 
 ## Use it as a template
@@ -64,7 +64,7 @@ pushing.
 - **Database changes.** Add a migration in `db/migrations/`, numbered after the last one, and run
   `bun run db:migrate`. Never edit a migration that has run. For a new table, `bun run protobase scaffold
   <connection string> --ui` reads the database and writes its `data.ts` and `ui.ts`, which you then adjust.
-- **Sign-in and accounts** are in `auth/`, on Better Auth ([Login](https://docs.protobase.net/reference/auth/)).
+- **Sign-in and accounts** are the `auth` key of `protobase.config.ts`, on Better Auth ([Login](https://docs.protobase.net/reference/auth/)).
 - **Coding agents.** [AGENTS.md](AGENTS.md) holds the rules an assistant follows when it changes the app.
 - Check every change with `bun run typecheck`, `bun run test`, `bun run build` and, with the migrations applied,
   `bun run db:doctor`, as CI does.
@@ -82,7 +82,7 @@ pushing.
 `config/<name>/data.ts` and its screens in `config/<name>/ui.ts`, all exported from `config/index.ts`, and
 `protobase dev` and `protobase serve` serve the API and the app from them.
 
-- Tested with Protobase **0.46.11**: the `@protobase/*` packages are pinned to it in `package.json`, and CI runs
+- Tested with Protobase **0.49.2**: the `@protobase/*` packages are pinned to it in `package.json`, and CI runs
   against it. To upgrade, set the new version on each `@protobase/*` package, run `bun install`, then
   `bun run typecheck`, `bun run test` and `bun run build`. The [release notes](https://github.com/PrototeamHQ/protobase/releases) say what changed.
 - Docs: [docs.protobase.net](https://docs.protobase.net). Source and issues: [PrototeamHQ/protobase](https://github.com/PrototeamHQ/protobase).
@@ -98,7 +98,7 @@ Sign in with one of the seeded accounts, all with the password `property-portal-
 | `bram@portal.example` | a member renting in Tokyo ("東京の賃貸 🗼"), in the daily digest, and near Sydney, without email |
 | `admin@portal.example` | runs the catalogue: places, agencies and listings, drafts included |
 
-Anyone can also make their own account: **Create an account** on the sign-in page, or on a sign-in prompt, emails a code to the address; once the code is right, a name and a password make a member ([Open sign-up](https://docs.protobase.net/reference/auth/#open-sign-up), turned on in `auth/accounts.ts`). It needs mail, `PROTOBASE_SMTP_URL` and `PROTOBASE_MAIL_FROM` in `.env`, with a mail catcher such as Mailpit in development; without them it is not offered.
+Anyone can also make their own account: **Create an account** on the sign-in page, or on a sign-in prompt, emails a code to the address; once the code is right, a name and a password make a member ([Open sign-up](https://docs.protobase.net/reference/auth/#open-sign-up), turned on in `protobase.config.ts`). It needs mail, `PROTOBASE_SMTP_URL` and `PROTOBASE_MAIL_FROM` in `.env`, with a mail catcher such as Mailpit in development; without them it is not offered.
 
 Other scripts: `db:reset` (drop, migrate, seed small), `typecheck`, `serve` (`protobase build`, then `protobase serve dist` on port 8787). More accounts: `bun run protobase users create you@example.com --generate-password` makes a member; `--role admin` an admin. The database tests run in [Protobase's repository](https://github.com/PrototeamHQ/protobase) (`bun run test:integration`).
 
@@ -161,7 +161,7 @@ Postgres keeps these rules itself:
 
 The listing page draws the listing's `latitude` and `longitude` on a map, and the listings' **Map** display the listings in its view on one, a listing whose `position_exact` is off with a hollow marker that says its position is approximate ([Approximate positions](https://docs.protobase.net/reference/ui-config/#approximate-positions)), both with the style `PROTOBASE_MAP_STYLE_URL` names ([Maps](https://docs.protobase.net/reference/ui-config/#maps)); without it there is no map. In development that is [OpenFreeMap](https://openfreemap.org)'s `https://tiles.openfreemap.org/styles/liberty`: the whole world from OpenStreetMap, free, without a key and with CORS for any origin, so the listings of every country show on a map; it needs the network. `bun run map:tiles` (`map/tiles.ts`) serves another, at `http://localhost:8790/style.json`: a proxy to a bucket of OpenMapTiles in one PMTiles archive, with its sprites and fonts, that covers only the Benelux and the British Isles. The bucket answers only its own sites' origins, so the proxy adds CORS headers for any origin and points the bucket's style at itself; it only reads the bucket. A deployed portal points `PROTOBASE_MAP_STYLE_URL` at a style and archive of its own, served with CORS for its origins.
 
-Both maps have a switch to aerial photos ([Map layers](https://docs.protobase.net/reference/ui-config/#map-layers)), set in `config/map-layers.ts` and passed as `options.maps.layers` in `protobase.config.ts`. Both sources are open data under CC BY 4.0, free and without a key, and answer any origin with CORS; each covers its own country, and elsewhere the default map shows through.
+Both maps have a switch to aerial photos ([Map layers](https://docs.protobase.net/reference/ui-config/#map-layers)), set in `config/map-layers.ts` and passed as `maps.layers` in `protobase.config.ts`. Both sources are open data under CC BY 4.0, free and without a key, and answer any origin with CORS; each covers its own country, and elsewhere the default map shows through.
 
 - **Aerial (NL)**: the Netherlands' latest 8 cm aerial photo from [PDOK Luchtfoto](https://www.pdok.nl/-/open-data-hr-luchtfoto) (`Actueel_orthoHR`), at `https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_orthoHR/EPSG:3857/{z}/{x}/{y}.jpeg`. Its [metadata](https://www.nationaalgeoregister.nl/geonetwork/srv/api/records/a301ddc7-c26f-42d8-b367-509ae5ae47d0) gives CC BY 4.0 with the organisation named, credited as Beeldmateriaal Nederland via PDOK.
 - **Aerial (ES)**: Spain's latest [PNOA](https://pnoa.ign.es/) orthophotos from the IGN, Sentinel-2 when zoomed out, at the WMTS `https://www.ign.es/wmts/pnoa-ma`, layer `OI.OrthoimageCoverage`, tile matrix set `GoogleMapsCompatible`. The IGN's [licence](https://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf) is CC BY 4.0, and a service used as it is takes the credit its capabilities name: `CC BY 4.0 scne.es`, linked to [scne.es](https://www.scne.es/).
@@ -184,7 +184,7 @@ Both photo fields store a `card` (800×600) and a `thumb` (96×96) WebP beside e
 
 ## Layout
 
-- `auth/`: the accounts (`auth.ts`), and who has one and what a new one is (`accounts.ts`).
+- `protobase.config.ts`: the app as one object: who has an account and what a new one is (`auth`), the jobs, the image library and the maps' layers.
 - `db/migrations/NNN_name.sql`: plain SQL, applied in order by `db/migrate.ts` and recorded in `public.schema_migrations`. The server never migrates.
 - `config/`: one folder per table (`data.ts`, `ui.ts`), the roles, the home page and the maps' aerial photo layers (`map-layers.ts`); `config/saved_searches/filter.ts` reads a search's filter against the listings. `config/roles.test.ts` checks who sees and writes what, `config/config.test.ts` runs the server's startup checks.
 - `jobs/`: the alert jobs, with the matching rule tested next to them.

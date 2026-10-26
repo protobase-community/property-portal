@@ -19,7 +19,7 @@ Protobase version as agent skills after `bun run protobase skill install`.
 
 ## Never touch
 
-- `auth/` and the `auth` schema: sign-in and accounts.
+- The `auth` key of `protobase.config.ts` and the `auth` schema: sign-in and accounts.
 - `.github/workflows/`.
 
 ## Scripts
