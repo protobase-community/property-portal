@@ -2,7 +2,7 @@
 
 Every resource of the portal is also a REST API at `/api/v1/<resource>`, described by an OpenAPI 3.1 document the server generates for the caller: `/api/openapi.json`, with an interactive reference at `/api/docs`. Both list only what the caller's role may see and do, so they need a token ([REST API](https://docs.protobase.net/reference/api/)).
 
-Start the example as in the [README](README.md#start); the commands below use `curl` and `jq` against `http://localhost:5173`.
+Start the example as in the [README](README.md#run-it-locally); the commands below use `curl` and `jq` against `http://localhost:5173`.
 
 ```sh
 BASE=http://localhost:5173
@@ -39,18 +39,20 @@ curl -s -G "$BASE/api/v1/listings" \
 
 ## Create a listing as admin and publish it
 
-A new listing without `published_at` is a draft that only admins see. The answer carries its `id` and `etag`.
+A new listing without `published_at` is a draft that only admins see. Its prices are in its `currency`, an ISO 4217 code. The answer carries its `id` and `etag`.
 
 ```sh
 CREATED=$(curl -s "$BASE/api/v1/listings" -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' -d '{
   "agency_id": 1, "place_id": 1, "property_type": "apartment",
   "address": "Prinsengracht 263", "postal_code": "1016 GV", "latitude": "52.375200", "longitude": "4.883900",
-  "purchase_price": "650000", "living_area": 85, "rooms": 3, "bedrooms": 2, "energy_label": "b",
+  "currency": "EUR", "purchase_price": "650000", "living_area": 85, "rooms": 3, "bedrooms": 2, "energy_label": "b",
   "description": "Canal-side apartment with a view.", "agent_name": "Sanne Visser", "agent_phone": "+31 20 123 4567"
 }')
 ID=$(echo "$CREATED" | jq -r .id)
 ETAG=$(echo "$CREATED" | jq -r .etag)
 ```
+
+A home elsewhere is written as its country writes it: `"address": "شارع الشيخ زايد، شقة 4502"` with `"postal_code": null` and `"currency": "AED"` in Dubai, or `"purchase_price": "38500000000"` in `"VND"` in Hanoi.
 
 Publishing is setting `published_at`. An update needs the record's `etag` in `If-Match`, so it never overwrites a change it has not seen. Publishing also matches the listing against the members' saved searches ([Alerts](README.md#alerts)).
 
