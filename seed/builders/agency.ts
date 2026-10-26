@@ -1,22 +1,38 @@
-import { agencyNames } from '../data/names'
+import { countryOf } from '../data/countries'
+import { fill, type NamePart } from '../data/country'
 import type { PlaceSeed } from '../data/places'
 import { slugify } from '../format'
-import { int, pick, rngAt, weighted } from '../rng'
+import { pick, rngAt, weighted } from '../rng'
 
-export type SeededAgency = { id: number; name: string; placeId: number; country: 'NL' | 'ES'; phone: string; email: string; website: string }
+export type SeededAgency = { id: number; name: string; placeId: number; country: string; phone: string; email: string; website: string }
 
-const phone = (country: 'NL' | 'ES', rand: () => number) =>
-  country === 'NL' ? `+31 ${int(rand, 10, 79)} ${int(rand, 100, 999)} ${int(rand, 1000, 9999)}` : `+34 9${int(rand, 10, 99)} ${int(rand, 100, 999)} ${int(rand, 100, 999)}`
+const text = (part: NamePart) => (typeof part === 'string' ? part : part[0])
+const latin = (part: NamePart) => (typeof part === 'string' ? slugify(part) : part[1])
 
-/** Agency `ordinal`, its office in a place picked by how many listings the place draws. */
+// The busiest place of each country, in the order the countries come: where its first agency opens.
+const busiest = (places: PlaceSeed[]) => {
+  const first = new Map<string, number>()
+  for (const [index, place] of places.entries()) {
+    const known = first.get(place.country)
+    if (known === undefined || place.weight > places[known]!.weight) first.set(place.country, index)
+  }
+  return [...first.values()]
+}
+
+/**
+ * Agency `ordinal`, its office in a place picked by how many listings the place draws. The first agencies open one in
+ * every country, so each has an agency to list its homes.
+ */
 export const agencyAt = (places: PlaceSeed[], ordinal: number): SeededAgency => {
   const rand = rngAt(301, ordinal)
-  const placeIndex = weighted(rand, places.map((place, index) => [index, place.weight] as const))
+  const opening = busiest(places)
+  const placeIndex = ordinal < opening.length ? opening[ordinal]! : weighted(rand, places.map((place, index) => [index, place.weight] as const))
   const place = places[placeIndex]!
-  const parts = agencyNames[place.country]
-  const base = place.country === 'NL' ? `${pick(rand, parts.first)} ${pick(rand, parts.second)}` : `${pick(rand, parts.first)} ${pick(rand, parts.second)}`
+  const country = countryOf(place.country)
+  const names = pick(rand, country.agencies)
+  const parts = [pick(rand, names.first), pick(rand, names.second)]
   // Names repeat across places; the place keeps them apart, and the ordinal keeps their sites apart.
-  const name = `${base} ${place.name}`
-  const domain = `${slugify(base)}-${ordinal + 1}.${place.country === 'NL' ? 'nl' : 'es'}`
-  return { id: ordinal + 1, name, placeId: placeIndex + 1, country: place.country, phone: phone(place.country, rand), email: `info@${domain}`, website: `https://www.${domain}` }
+  const name = `${parts.map(text).join(names.joined ?? ' ')} ${place.name}`
+  const domain = `${parts.map(latin).filter(Boolean).join('-')}-${ordinal + 1}.${country.domain}`
+  return { id: ordinal + 1, name, placeId: placeIndex + 1, country: place.country, phone: fill(country.phone.office, rand), email: `info@${domain}`, website: `https://www.${domain}` }
 }

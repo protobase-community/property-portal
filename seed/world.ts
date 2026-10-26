@@ -14,7 +14,7 @@ export type SeededAlert = { search: SeededSearch; listing: SeededListing; matche
 /** Alerts go back this far: what members heard of recently. */
 const alertWindow = 30 * DAY
 
-// The daily digest goes out at 7 in Amsterdam: 05:00 UTC in summer time, close enough for the sample.
+// The daily digest goes out at 7 in Amsterdam (jobs/daily-alerts.ts): 05:00 UTC in summer time, close enough for the sample.
 const nextDigest = (after: number) => {
   const day = Math.floor(after / DAY) * DAY + 5 * 3_600_000
   return day > after ? day : day + DAY
@@ -68,8 +68,10 @@ export const buildWorld = (scale: ScaleName) => {
   const agencies = Array.from({ length: counts.agencies }, (_, ordinal) => agencyAt(places, ordinal))
   const agenciesByPlace = new Map<number, SeededAgency[]>()
   for (const agency of agencies) agenciesByPlace.set(agency.placeId, [...(agenciesByPlace.get(agency.placeId) ?? []), agency])
-  const agenciesByCountry = { NL: agencies.filter((agency) => agency.country === 'NL'), ES: agencies.filter((agency) => agency.country === 'ES') }
-  if (agenciesByCountry.NL.length === 0 || agenciesByCountry.ES.length === 0) throw new Error('Every country needs an agency: raise the scale\'s agencies')
+  const agenciesByCountry = new Map<string, SeededAgency[]>()
+  for (const agency of agencies) agenciesByCountry.set(agency.country, [...(agenciesByCountry.get(agency.country) ?? []), agency])
+  const without = [...new Set(places.map((place) => place.country))].filter((country) => !agenciesByCountry.has(country))
+  if (without.length > 0) throw new Error(`Every country needs an agency, and ${without.join(', ')} have none: raise the scale's agencies`)
   const listings = Array.from({ length: counts.listings }, (_, ordinal) => listingAt(places, agenciesByPlace, agenciesByCountry, ordinal))
 
   const generated = Array.from({ length: counts.members - 2 }, (_, ordinal) => memberAt(ordinal))

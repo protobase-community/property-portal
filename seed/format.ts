@@ -10,11 +10,15 @@ export const row = (...values: unknown[]) => values.map(cell).join('\t') + '\n'
 
 export const iso = (ms: number) => new Date(ms).toISOString()
 
+// Latin letters that no accent strips down to a plain one.
+const plain: Record<string, string> = { ß: 'ss', æ: 'ae', ø: 'o', œ: 'oe', þ: 'th', ð: 'd', ł: 'l', đ: 'd', ı: 'i', ŀ: 'l' }
+
 export const slugify = (text: string) =>
   text
+    .toLowerCase()
+    .replace(/[ßæøœþðłđıŀ]/g, (char) => plain[char]!)
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
     .replace(/&/g, 'and')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
