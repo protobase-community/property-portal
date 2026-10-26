@@ -35,4 +35,6 @@ jobs:
       - run: bun run test
       - run: bun run build
       - run: bun run db:migrate
+      # The check Protobase Cloud runs on every deploy: a filterable or sortable field without an index fails it.
+      - run: bun run db:doctor
       - run: bun run db:seed --scale small

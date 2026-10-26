@@ -19,6 +19,7 @@
     "db:seed": "bun seed/cli.ts",
     "db:reset": "bun db/drop.ts && bun db/migrate.ts && bun seed/cli.ts --scale small",
     "map:tiles": "bun map/tiles.ts",
+    "db:doctor": "bun --env-file=.env run protobase doctor --env DATABASE_URL",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "protobase": "protobase",

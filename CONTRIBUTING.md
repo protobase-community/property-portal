@@ -23,7 +23,7 @@ than in this app, belongs in [Protobase's issues](https://github.com/PrototeamHQ
 
 3. Make your change. A change to the database is a new migration in `db/migrations/`, numbered after the last one;
    never edit one that exists. [AGENTS.md](AGENTS.md) has the rules this app follows.
-4. Check it with `bun run typecheck`, `bun run test` and `bun run build`, as CI does.
+4. Check it with `bun run typecheck`, `bun run test`, `bun run build` and `bun run db:doctor`, as CI does.
 5. Open a pull request that says what changed and why.
 
 Keep each pull request to one change. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org),

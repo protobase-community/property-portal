@@ -19,6 +19,7 @@ You need [Bun](https://bun.sh) 1.4 and Docker.
 bun install
 bun run db:up                     # Postgres 18 in Docker on port 55435; creates .env from .env.example
 bun run db:migrate
+bun run db:doctor                 # checks the config against the database, as a deploy to Protobase Cloud does
 bun run db:seed --scale small     # small | medium | large
 bun run map:tiles                 # the listing map's tiles, in a terminal of its own
 bun run dev                       # http://localhost:5173
@@ -51,7 +52,8 @@ You can also fork it to contribute back, or start from it with `git clone https:
   <connection string> --ui` reads the database and writes its `data.ts` and `ui.ts`, which you then adjust.
 - **Sign-in and accounts** are in `auth/`, on Better Auth ([Login](https://docs.protobase.net/reference/auth/)).
 - **Coding agents.** [AGENTS.md](AGENTS.md) holds the rules an assistant follows when it changes the app.
-- Check every change with `bun run typecheck`, `bun run test` and `bun run build`, as CI does.
+- Check every change with `bun run typecheck`, `bun run test`, `bun run build` and, with the migrations applied,
+  `bun run db:doctor`, as CI does.
 
 - **Who sees what.** Members' rows are theirs through `.owner(...)` and `.own` capabilities; the roles are in
   `config/roles.ts` ([Access](https://docs.protobase.net/reference/access/)).
