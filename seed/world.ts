@@ -23,7 +23,7 @@ const nextDigest = (after: number) => {
 // The listing as the match-listing job reads its row when it is published: available, by field name.
 const recordOf = (listing: SeededListing): ListingRecord => ({
   id: listing.id, agency_id: listing.agencyId, place_id: listing.placeId, property_type: listing.propertyType, status: 'available',
-  address: listing.address, postal_code: listing.postalCode, latitude: listing.latitude, longitude: listing.longitude,
+  address: listing.address, postal_code: listing.postalCode, currency: listing.currency, latitude: listing.latitude, longitude: listing.longitude,
   purchase_price: listing.purchasePrice, rent_price: listing.rentPrice, for_sale: listing.purchasePrice !== null, for_rent: listing.rentPrice !== null,
   living_area: listing.livingArea, plot_area: listing.plotArea, rooms: listing.rooms, bedrooms: listing.bedrooms, bathrooms: listing.bathrooms,
   built_year: listing.builtYear, energy_label: listing.energyLabel, garden: listing.garden, balcony: listing.balcony, parking: listing.parking,

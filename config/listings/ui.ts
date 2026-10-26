@@ -25,11 +25,12 @@ export const listingsView = view<typeof listings>('listings')
     place_id: r.place_id.label('Place'),
     property_type: r.property_type.label('Type').valueLabels(propertyTypeLabels).icon('house'),
     status: r.status.format('badge').valueLabels({ available: 'Available', under_offer: 'Under offer', sold: 'Sold', let: 'Let' }),
-    purchase_price: r.purchase_price.label('Purchase price').prefix('€').decimals(0).help('The asking price. Empty when the home is not for sale.').icon('tag'),
-    rent_price: r.rent_price.label('Rent').prefix('€').suffix(' /month').decimals(0).help('The rent per month. Empty when the home is not for rent.').icon('key'),
+    currency: r.currency.help('The currency of the prices, the one the agency asks in.').icon('banknote'),
+    purchase_price: r.purchase_price.label('Purchase price').decimals(0).help('The asking price, in the currency. Empty when the home is not for sale.').icon('tag'),
+    rent_price: r.rent_price.label('Rent').suffix(' /month').decimals(0).help('The rent per month, in the currency. Empty when the home is not for rent.').icon('key'),
     for_sale: r.for_sale.label('For sale'),
     for_rent: r.for_rent.label('For rent'),
-    price_per_m2: r.price_per_m2.label('Price per m²').prefix('€').decimals(0).help('From the purchase price.'),
+    price_per_m2: r.price_per_m2.label('Price per m²').decimals(0).help('From the purchase price, in the currency.'),
     living_area: r.living_area.label('Living area').suffix(' m²').icon('ruler'),
     plot_area: r.plot_area.label('Plot').suffix(' m²').icon('land-plot'),
     rooms: r.rooms.icon('door-open'),
@@ -47,12 +48,12 @@ export const listingsView = view<typeof listings>('listings')
     published_at: r.published_at.label('Published').help('Empty while the listing is a draft that only admins see.'),
   }))
   .list((r, d) => ({
-    columns: [r.address, r.place_id, r.property_type, r.purchase_price, r.rent_price, r.living_area, r.rooms, r.energy_label, r.status, r.published_at],
+    columns: [r.address, r.place_id, r.property_type, r.currency, r.purchase_price, r.rent_price, r.living_area, r.rooms, r.energy_label, r.status, r.published_at],
     sort: [[r.published_at, 'desc']],
     search: [r.address, r.postal_code],
     displays: [
       d.cards(
-        { image: r.photo, title: r.address, amount: [r.purchase_price, r.rent_price], badge: r.status, meta: [r.living_area, r.bedrooms, r.energy_label], footer: [r.place_id, r.agent_name], flags: [r.garden, r.balcony, r.parking] },
+        { image: r.photo, title: r.address, amount: [r.purchase_price, r.rent_price], badge: r.status, meta: [r.currency, r.living_area, r.bedrooms, r.energy_label], footer: [r.place_id, r.agent_name], flags: [r.garden, r.balcony, r.parking] },
         { label: 'Photos', photos, favorite: { resource: 'favorites', field: 'listing_id', label: 'Save to favorites' } },
       ),
       d.map({ latitude: r.latitude, longitude: r.longitude, exact: r.position_exact }, { label: 'Map' }),
@@ -63,6 +64,7 @@ export const listingsView = view<typeof listings>('listings')
     w.flags([r.for_sale, r.for_rent], { label: 'Offer' }),
     w.facets(r.place_id, { search: true }),
     w.facets(r.property_type),
+    w.facets(r.currency),
     w.range(r.purchase_price, { histogram: true }),
     w.range(r.rent_price, { histogram: true }),
     w.range(r.living_area),
@@ -78,7 +80,7 @@ export const listingsView = view<typeof listings>('listings')
   .helpWhen('editing')
   .layout((r) => [
     l.gallery('Photos', { image: r.photo, photos }),
-    l.section('Key facts', [r.purchase_price, r.rent_price, r.price_per_m2, r.property_type, r.living_area, r.plot_area, r.rooms, r.bedrooms, r.bathrooms, r.energy_label], { help: keyFactsHelp, presentation: 'facts' }),
+    l.section('Key facts', [r.purchase_price, r.rent_price, r.currency, r.price_per_m2, r.property_type, r.living_area, r.plot_area, r.rooms, r.bedrooms, r.bathrooms, r.energy_label], { help: keyFactsHelp, presentation: 'facts' }),
     l.section('About this home', [r.description]),
     l.section('Features', [r.built_year, r.garden, r.balcony, r.parking]),
     l.map('Location', { latitude: r.latitude, longitude: r.longitude }),
@@ -107,7 +109,7 @@ export const memberListingsView = listingsView
 export const adminListingsView = memberListingsView
   .layout((r) => [
     l.gallery('Photos', { image: r.photo, photos }),
-    l.section('Key facts', [r.purchase_price, r.rent_price, r.price_per_m2, r.property_type, r.living_area, r.plot_area, r.rooms, r.bedrooms, r.bathrooms, r.energy_label], { help: keyFactsHelp, presentation: 'facts' }),
+    l.section('Key facts', [r.purchase_price, r.rent_price, r.currency, r.price_per_m2, r.property_type, r.living_area, r.plot_area, r.rooms, r.bedrooms, r.bathrooms, r.energy_label], { help: keyFactsHelp, presentation: 'facts' }),
     l.section('About this home', [r.description]),
     l.section('Features', [r.built_year, r.garden, r.balcony, r.parking]),
     l.map('Location', { latitude: r.latitude, longitude: r.longitude }),

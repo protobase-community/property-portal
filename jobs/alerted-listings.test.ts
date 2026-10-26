@@ -3,7 +3,7 @@ import { alertedListings, type AlertRow } from './alerted-listings'
 
 const base = 'https://portal.example.com'
 // Two alerts for one flat from two searches, and one for a house, as the email-alerts job reads them.
-const flat: AlertRow = { listing_id: '42', address: 'Spaarne 12', place: 'Haarlem', purchase_price: '450000.00', rent_price: null, living_area: 85, search_id: '3', search: 'Haarlem' }
+const flat: AlertRow = { listing_id: '42', address: 'Spaarne 12', place: 'Haarlem', currency: 'EUR', purchase_price: '450000.00', rent_price: null, living_area: 85, search_id: '3', search: 'Haarlem' }
 const house: AlertRow = { ...flat, listing_id: '7', address: 'Dorpsstraat 1' }
 
 describe('alertedListings', () => {
@@ -14,6 +14,6 @@ describe('alertedListings', () => {
       { name: 'Haarlem', url: `${base}/saved_searches/3` },
       { name: null, url: `${base}/saved_searches/5` },
     ])
-    expect(listings[0]).toMatchObject({ purchasePrice: '450000.00', rentPrice: null, livingArea: 85 })
+    expect(listings[0]).toMatchObject({ currency: 'EUR', purchasePrice: '450000.00', rentPrice: null, livingArea: 85 })
   })
 })

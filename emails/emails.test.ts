@@ -6,12 +6,19 @@ import { instantAlert } from './instant-alert'
 
 const app = { name: 'Property portal', url: 'https://portal.example.com/' }
 const canalFlat = { name: 'Canal flat', url: 'https://portal.example.com/saved_searches/3' }
-const flat: AlertedListing = { address: 'Keizersgracht 123-2', place: 'Amsterdam', purchasePrice: '650000.00', rentPrice: null, livingArea: 92, url: 'https://portal.example.com/listings/42', searches: [canalFlat] }
+const flat: AlertedListing = { address: 'Keizersgracht 123-2', place: 'Amsterdam', currency: 'EUR', purchasePrice: '650000.00', rentPrice: null, livingArea: 92, url: 'https://portal.example.com/listings/42', searches: [canalFlat] }
 const piso: AlertedListing = {
-  address: 'Calle de Serrano, 45', place: 'Madrid', purchasePrice: null, rentPrice: '2100.00', livingArea: 80, url: 'https://portal.example.com/listings/7',
+  address: 'Calle de Serrano, 45', place: 'Madrid', currency: 'EUR', purchasePrice: null, rentPrice: '2100.00', livingArea: 80, url: 'https://portal.example.com/listings/7',
   searches: [{ name: 'Madrid centro', url: 'https://portal.example.com/saved_searches/5' }],
 }
 const searchesUrl = 'https://portal.example.com/saved_searches'
+// Homes in other scripts and currencies: right-to-left Arabic and Hebrew, Japanese, and a search named with an emoji.
+const dubai: AlertedListing = {
+  address: 'شارع الشيخ زايد، 214', place: 'دبي', currency: 'AED', purchasePrice: '1450000.00', rentPrice: null, livingArea: 96, url: 'https://portal.example.com/listings/8',
+  searches: [{ name: 'شقة في دبي 🌴', url: 'https://portal.example.com/saved_searches/6' }],
+}
+const tokyo: AlertedListing = { ...dubai, address: '渋谷区神宮前3丁目14-7 702号室', place: '東京', currency: 'JPY', purchasePrice: null, rentPrice: '185000.00', livingArea: 41 }
+const telAviv: AlertedListing = { ...dubai, address: 'רחוב דיזנגוף 120, דירה 4', place: 'תל אביב-יפו', currency: 'ILS', purchasePrice: '4650000.00', rentPrice: '9800.00' }
 
 describe('the instant alert', () => {
   it('names the one listing, with its price, size, search and link', async () => {
@@ -48,6 +55,28 @@ describe('the daily digest', () => {
 
 describe('prices', () => {
   it('gives both prices of a home offered both ways', () => {
-    expect(prices({ purchasePrice: '650000.00', rentPrice: '2450.00' })).toBe('For sale: €650,000 or for rent: €2,450 a month')
+    expect(prices({ currency: 'EUR', purchasePrice: '650000.00', rentPrice: '2450.00' })).toBe('For sale: €650,000 or for rent: €2,450 a month')
+  })
+
+  it("writes each price in the listing's own currency, whole", () => {
+    expect(prices(tokyo)).toBe('For rent: ¥185,000 a month')
+    expect(prices(telAviv)).toBe('For sale: ₪4,650,000 or for rent: ₪9,800 a month')
+    expect(prices({ currency: 'VND', purchasePrice: '14400000000.00', rentPrice: null })).toBe('For sale: ₫14,400,000,000')
+    expect(prices({ currency: 'INR', purchasePrice: '23500000.00', rentPrice: null })).toBe('For sale: ₹23,500,000')
+    expect(prices({ currency: 'GBP', purchasePrice: '725000.00', rentPrice: null })).toBe('For sale: £725,000')
+  })
+})
+
+describe('a home in another script', () => {
+  it('keeps its address, place and search name whole in the subject and the text', async () => {
+    const email = await instantAlert.render({ app, listings: [dubai], searchesUrl })
+    expect(email.subject).toBe('New: شارع الشيخ زايد، 214, دبي')
+    // A no-break space keeps the code with its amount.
+    expect(email.text).toContain('For sale: AED\u00a01,450,000, 96 m²')
+    expect(email.text).toContain('Fits "شقة في دبي 🌴"')
+    const digest = await dailyDigest.render({ app, listings: [tokyo, telAviv], searchesUrl })
+    expect(digest.text).toContain('渋谷区神宮前3丁目14-7 702号室, 東京')
+    expect(digest.text).toContain('רחוב דיזנגוף 120, דירה 4, תל אביב-יפו')
+    expect(digest.html).toContain('渋谷区神宮前3丁目14-7 702号室')
   })
 })

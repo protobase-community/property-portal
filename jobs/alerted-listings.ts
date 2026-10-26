@@ -6,6 +6,7 @@ export type AlertRow = {
   listing_id: string | number
   address: string
   place: string
+  currency: string
   purchase_price: string | number | null
   rent_price: string | number | null
   living_area: number
@@ -31,6 +32,7 @@ export const alertedListings = (rows: AlertRow[], base: string): AlertedListing[
     listings.set(String(row.listing_id), {
       address: row.address,
       place: row.place,
+      currency: row.currency,
       purchasePrice: amount(row.purchase_price),
       rentPrice: amount(row.rent_price),
       livingArea: row.living_area,

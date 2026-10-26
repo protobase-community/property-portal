@@ -19,6 +19,8 @@ export type SeededListing = {
   status: 'available' | 'under_offer' | 'sold' | 'let'
   address: string
   postalCode: string
+  /** The ISO 4217 currency of its prices. */
+  currency: string
   latitude: number
   longitude: number
   /** False when the listing gives its position only roughly. */
@@ -151,6 +153,7 @@ export const listingAt = (places: PlaceSeed[], agenciesByPlace: Map<number, Seed
     status,
     address: addressOf(country, propertyType, rand),
     postalCode: postalOf(place, rand),
+    currency: 'EUR',
     latitude: Number((place.latitude + (rand() - 0.5) * 0.06).toFixed(6)),
     longitude: Number((place.longitude + (rand() - 0.5) * 0.09).toFixed(6)),
     positionExact: rngAt(407, ordinal)() >= approximatePosition[country],

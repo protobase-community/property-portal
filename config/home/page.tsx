@@ -8,7 +8,7 @@ import { Page, RecordRow, page } from '@protobase/layout'
  */
 export const home = page(
   'home',
-  <Page title="Find a home" description="Houses and apartments for sale and for rent in the Netherlands and Spain, from the agencies on the portal.">
+  <Page title="Find a home" description="Houses and apartments for sale and for rent around the world, from the agencies on the portal.">
     <RecordRow title="For sale" resource="listings" filter="for_sale = true AND status = 'available'" sort="published_at desc" />
     <RecordRow title="For rent" resource="listings" filter="for_rent = true AND status = 'available'" sort="published_at desc" />
     <RecordRow title="Newest listings" resource="listings" sort="published_at desc" limit={24} />

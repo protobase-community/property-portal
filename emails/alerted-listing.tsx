@@ -4,10 +4,14 @@ import { Hr, Link, Section, Text } from 'react-email'
 /** A search of the member's that a listing fits: its name, `null` for one saved without a name, and its page. */
 export type FittingSearch = { name: string | null; url: string }
 
-/** A new listing as an alert mails it: a price empty when it is not offered that way, its page, and the searches it fits. */
+/**
+ * A new listing as an alert mails it: a price empty when it is not offered that way, both in `currency` (ISO 4217), its
+ * page, and the searches it fits.
+ */
 export type AlertedListing = {
   address: string
   place: string
+  currency: string
   purchasePrice: string | null
   rentPrice: string | null
   livingArea: number
@@ -15,13 +19,15 @@ export type AlertedListing = {
   searches: FittingSearch[]
 }
 
-const euros = (amount: string) => `€${Math.round(Number(amount)).toLocaleString('en-GB')}`
+// Whole amounts in the mail's English, with the currency's own sign where English has one: €650,000, ¥82,000,000, AED 1,450,000.
+const money = (amount: string, currency: string) =>
+  new Intl.NumberFormat('en', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Math.round(Number(amount)))
 
 /** What it costs each way it is offered: "For sale: €650,000 or for rent: €2,100 a month". */
-export const prices = (listing: Pick<AlertedListing, 'purchasePrice' | 'rentPrice'>) => {
+export const prices = (listing: Pick<AlertedListing, 'currency' | 'purchasePrice' | 'rentPrice'>) => {
   const offers = [
-    ...(listing.purchasePrice === null ? [] : [`for sale: ${euros(listing.purchasePrice)}`]),
-    ...(listing.rentPrice === null ? [] : [`for rent: ${euros(listing.rentPrice)} a month`]),
+    ...(listing.purchasePrice === null ? [] : [`for sale: ${money(listing.purchasePrice, listing.currency)}`]),
+    ...(listing.rentPrice === null ? [] : [`for rent: ${money(listing.rentPrice, listing.currency)} a month`]),
   ].join(' or ')
   return offers.charAt(0).toUpperCase() + offers.slice(1)
 }

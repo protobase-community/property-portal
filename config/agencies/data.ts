@@ -1,6 +1,6 @@
 import { f, resource } from '@protobase/schema'
 
-/** market.agencies: an estate agent (makelaar, inmobiliaria) that lists homes on the portal. */
+/** market.agencies: an estate agent (makelaar, inmobiliaria, 不動産会社, وكالة عقارية) that lists homes on the portal. */
 export const agencies = resource('agencies')
   .table('market.agencies')
   .fields({

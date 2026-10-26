@@ -32,7 +32,7 @@ export const emailAlerts = defineJob({
       .innerJoin('members.saved_searches as s', 's.id', 'a.saved_search_id')
       .innerJoin('market.listings as l', 'l.id', 'a.listing_id')
       .innerJoin('market.places as pl', 'pl.id', 'l.place_id')
-      .select(['a.id', 'l.id as listing_id', 'l.address', 'pl.name as place', 'l.purchase_price', 'l.rent_price', 'l.living_area', 's.id as search_id', 's.name as search'])
+      .select(['a.id', 'l.id as listing_id', 'l.address', 'pl.name as place', 'l.currency', 'l.purchase_price', 'l.rent_price', 'l.living_area', 's.id as search_id', 's.name as search'])
       .where('a.user_id', '=', userId)
       .where('a.emailed_at', 'is', null)
       .where('a.mail_due', '=', true)

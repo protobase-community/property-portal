@@ -7,7 +7,7 @@ export const places = resource('places')
     id: f.integer().readOnly().filterable().sortable().dbDefault(),
     name: f.text().filterable().sortable(),
     region: f.text().filterable().sortable(),
-    country: f.enum(['NL', 'ES']).filterable().sortable(),
+    country: f.country().filterable().sortable(),
     latitude: f.decimal({ precision: 8, scale: 6 }),
     longitude: f.decimal({ precision: 9, scale: 6 }),
   })

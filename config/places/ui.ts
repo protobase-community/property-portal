@@ -8,8 +8,8 @@ export const placesView = view<typeof places>('places')
   .helpWhen('editing')
   .nav({ group: 'Browse', order: 3 })
   .fields((r) => ({
-    region: r.region.help('The province in the Netherlands, the autonomous community in Spain.'),
-    country: r.country.format('badge').valueLabels({ NL: 'Netherlands', ES: 'Spain' }),
+    region: r.region.help('The province, state or prefecture, as the country writes it.'),
+    country: r.country.format('badge'),
     latitude: r.latitude.help('The centre, in decimal degrees (WGS84), that a search around the place measures from.').decimals(6),
     longitude: r.longitude.help('Decimal degrees, WGS84.').decimals(6),
   }))
