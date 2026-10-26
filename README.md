@@ -17,7 +17,7 @@ You need [Bun](https://bun.sh) 1.4 and Docker.
 
 ```sh
 bun install
-bun run db:up                     # Postgres 18 in Docker on port 55432; creates .env from .env.example
+bun run db:up                     # Postgres 18 in Docker on port 55435; creates .env from .env.example
 bun run db:migrate
 bun run db:seed --scale small     # small | medium | large
 bun run map:tiles                 # the listing map's tiles, in a terminal of its own
@@ -88,10 +88,10 @@ Other scripts: `db:reset` (drop, migrate, seed small), `typecheck`, `serve` (`pr
 
 The same data is a REST API with an OpenAPI document: [API.md](API.md) walks through signing in, listing published listings and creating and publishing one with `curl`.
 
-Connection string, which scripts read from `DATABASE_URL`:
+Connection string, which scripts read from `DATABASE_URL` (port 55435 avoids a local Postgres on 5432 and the other Protobase templates, which take 55432, 55433 and 55434, so they run side by side):
 
 ```
-postgres://protobase:protobase@localhost:55432/property_portal
+postgres://protobase:protobase@localhost:55435/property_portal
 ```
 
 ## Who sees what
