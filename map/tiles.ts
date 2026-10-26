@@ -3,7 +3,7 @@ import { Readable } from 'node:stream'
 import type { ReadableStream } from 'node:stream/web'
 import { tilesProxy } from './tiles-proxy'
 
-// `bun run map:tiles`: the development map tiles at http://localhost:8790, which PROTOBASE_MAP_STYLE_URL in .env names.
+// `bun run map:tiles`: map tiles of the Benelux and the British Isles at http://localhost:8790, for PROTOBASE_MAP_STYLE_URL.
 const port = Number(process.env.PORT ?? 8790)
 const proxy = tilesProxy(fetch)
 

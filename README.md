@@ -28,7 +28,6 @@ bun run db:up                     # Postgres 18 in Docker on port 55435; creates
 bun run db:migrate
 bun run db:doctor                 # checks the config against the database, as a deploy to Protobase Cloud does
 bun run db:seed --scale small     # small | medium | large
-bun run map:tiles                 # the listing map's tiles, in a terminal of its own
 bun run dev                       # http://localhost:5173
 bun run test
 ```
@@ -160,7 +159,7 @@ Postgres keeps these rules itself:
 
 ## Map
 
-The listing page draws the listing's `latitude` and `longitude` on a map, and the listings' **Map** display the listings in its view on one, a listing whose `position_exact` is off with a hollow marker that says its position is approximate ([Approximate positions](https://docs.protobase.net/reference/ui-config/#approximate-positions)), both with the style `PROTOBASE_MAP_STYLE_URL` names ([Maps](https://docs.protobase.net/reference/ui-config/#maps)); without it there is no map. In development that is `http://localhost:8790/style.json`, from `bun run map:tiles` (`map/tiles.ts`): a proxy to a bucket of OpenMapTiles in one PMTiles archive, with its sprites and fonts. The bucket answers only its own sites' origins, so the proxy adds CORS headers for any origin and points the bucket's style at itself; it only reads the bucket, and needs the network. The archive covers the Benelux and the British Isles in detail, so a Spanish listing shows its pin on an empty map until the switch shows its aerial photo. A deployed portal points `PROTOBASE_MAP_STYLE_URL` at a style and archive of its own, served with CORS for its origins.
+The listing page draws the listing's `latitude` and `longitude` on a map, and the listings' **Map** display the listings in its view on one, a listing whose `position_exact` is off with a hollow marker that says its position is approximate ([Approximate positions](https://docs.protobase.net/reference/ui-config/#approximate-positions)), both with the style `PROTOBASE_MAP_STYLE_URL` names ([Maps](https://docs.protobase.net/reference/ui-config/#maps)); without it there is no map. In development that is [OpenFreeMap](https://openfreemap.org)'s `https://tiles.openfreemap.org/styles/liberty`: the whole world from OpenStreetMap, free, without a key and with CORS for any origin, so the listings of every country show on a map; it needs the network. `bun run map:tiles` (`map/tiles.ts`) serves another, at `http://localhost:8790/style.json`: a proxy to a bucket of OpenMapTiles in one PMTiles archive, with its sprites and fonts, that covers only the Benelux and the British Isles. The bucket answers only its own sites' origins, so the proxy adds CORS headers for any origin and points the bucket's style at itself; it only reads the bucket. A deployed portal points `PROTOBASE_MAP_STYLE_URL` at a style and archive of its own, served with CORS for its origins.
 
 Both maps have a switch to aerial photos ([Map layers](https://docs.protobase.net/reference/ui-config/#map-layers)), set in `config/map-layers.ts` and passed as `options.maps.layers` in `protobase.config.ts`. Both sources are open data under CC BY 4.0, free and without a key, and answer any origin with CORS; each covers its own country, and elsewhere the default map shows through.
 
