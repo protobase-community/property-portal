@@ -82,7 +82,7 @@ pushing.
 `config/<name>/data.ts` and its screens in `config/<name>/ui.ts`, all exported from `config/index.ts`, and
 `protobase dev` and `protobase serve` serve the API and the app from them.
 
-- Tested with Protobase **0.53.3**: the `@protobase/*` packages are in `devDependencies` at its caret range, so the app is
+- Tested with Protobase **0.53.8**: the `@protobase/*` packages are in `devDependencies` at its caret range, so the app is
   a bundled project: `protobase dev`, `protobase build` and the scripts, through `protobase run`, use the CLI's own
   copies, and any CLI in that range runs it ([Versioning](https://docs.protobase.net/reference/versioning/)). CI runs
   against it, and a GitHub Action moves the range to each new release once CI passes on it. To upgrade by hand, set
