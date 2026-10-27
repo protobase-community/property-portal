@@ -88,6 +88,7 @@ pushing.
   against it, and a GitHub Action moves the range to each new release once CI passes on it. To upgrade by hand, set
   the new range on each `@protobase/*` package, run `bun install`, then `bun run typecheck`, `bun run test` and
   `bun run build`. The [release notes](https://github.com/PrototeamHQ/protobase/releases) say what changed.
+  <gap>The bump Action cannot keep the caret range because the shared bump workflow writing `^` ranges is not implemented.</gap>
 - Docs: [docs.protobase.net](https://docs.protobase.net). Source and issues: [PrototeamHQ/protobase](https://github.com/PrototeamHQ/protobase).
 - This app started as an example in Protobase's repository; its history came with it.
 
