@@ -38,12 +38,12 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@protobase/cli": "^0.58.8",
-    "@protobase/config": "^0.58.8",
-    "@protobase/layout": "^0.58.8",
-    "@protobase/schema": "^0.58.8",
-    "@protobase/server": "^0.58.8",
-    "@protobase/ui": "^0.58.8",
+    "@protobase/cli": "^0.63.0",
+    "@protobase/config": "^0.63.0",
+    "@protobase/layout": "^0.63.0",
+    "@protobase/schema": "^0.63.0",
+    "@protobase/server": "^0.63.0",
+    "@protobase/ui": "^0.63.0",
     "@types/node": "^22.20.5",
     "@types/pg": "^8.23.1",
     "@types/react": "^19.3.0",
