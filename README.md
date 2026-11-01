@@ -85,7 +85,7 @@ pushing.
 - Tested with Protobase **0.63.0**: the `@protobase/*` packages are in `devDependencies` at its caret range, so the app is
   a bundled project: `protobase dev`, `protobase build` and the scripts, through `protobase run`, use the CLI's own
   copies, and any CLI in that range runs it ([Versioning](https://docs.protobase.net/reference/versioning/)). CI runs
-  against it, and a GitHub Action moves the range to each new release once CI passes on it. To upgrade by hand, set
+  against it. To upgrade by hand, set
   the new range on each `@protobase/*` package, run `bun install`, then `bun run typecheck`, `bun run test` and
   `bun run build`. The [release notes](https://github.com/PrototeamHQ/protobase/releases) say what changed.
 - Docs: [docs.protobase.net](https://docs.protobase.net). Source and issues: [PrototeamHQ/protobase](https://github.com/PrototeamHQ/protobase).
