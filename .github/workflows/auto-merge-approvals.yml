@@ -1,5 +1,5 @@
-# Merges a pull request with the auto-merge-approvals label once its head is approved, by CodeRabbit or by anyone with
-# write access, and every check on its head passed. Adding the label to an approved, green pull request merges it. The shared workflow holds the rules:
+# Merges a pull request with the auto-merge-approvals label once every check on its head passed and the head is approved:
+# by CodeRabbit, even before the label was added, or by anyone with write access after the label was added. The shared workflow holds the rules:
 # https://github.com/protobase-community/.github/blob/main/.github/workflows/auto-merge-approvals.yml
 # A merge with GITHUB_TOKEN starts no workflow, so it then starts ci.yml on the default branch.
 name: auto-merge-approvals
